@@ -3,6 +3,7 @@ Documentation     Starter robot for the Beginners' course.
 Library           RPA.Browser.Selenium
 Library           RPA.Tables
 Library           RPA.PDF
+Library           RPA.Archive
 #Suite Teardown    Close All Browsers
 
 *** Variable ***
@@ -55,17 +56,21 @@ ${RETRY_AFTER_TIME}     1 sec
     [Arguments]    ${orderNumber}
     Wait Until Element Is Visible    ${RECEIPT_SELECTOR}
     ${receipt}=    Get Element Attribute    ${RECEIPT_SELECTOR}    outerHTML
-    Html To Pdf    ${receipt}    ${CURDIR}${/}output${/}receipt_${orderNumber}.pdf
+    Html To Pdf    ${receipt}    ${CURDIR}${/}output${/}receipts${/}receipt_${orderNumber}.pdf
     ${robotImages}=     Create List
         ...     ${CURDIR}${/}output${/}receipt_${orderNumber}.pdf
         ...     ${CURDIR}${/}output${/}robot_screenshot_${orderNumber}.png:width=200px,align=center    
-    Add Files To Pdf   ${robotImages}   ${CURDIR}${/}output${/}receipt_${orderNumber}.pdf
+    Add Files To Pdf   ${robotImages}   ${CURDIR}${/}output${/}receipts${/}receipt_${orderNumber}.pdf
     Close All Pdfs
 
 *** Keywords***
 7 order another
     Wait Until Page Contains Element    id:order-another
     Click Button    id:order-another
+
+*** Keywords ***
+archieve to zip
+    Archive Folder With Zip     ${CURDIR}${/}output${/}receipts     receipts.zip
 
 *** Tasks ***
 from orderlist, foreach order, submit order and save receipt
