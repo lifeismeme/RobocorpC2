@@ -1,13 +1,10 @@
 *** Settings ***
-Documentation     Starter robot for the Beginners' course.
-#Library           RPA.Browser.Playwright
-#Library           RPA.FTP
+Documentation     Roborcorp course level 2
 Library           RPA.Browser.Selenium
-Library           RPA.Http
+Library           RPA.HTTP
 Library           RPA.Tables
 Library           RPA.PDF
 Library           RPA.Archive
-#Suite Teardown    Close All Browsers
 
 *** Variable ***
 ${INPUT_FILE}    ${CURDIR}${/}input${/}orderlist.csv
@@ -83,7 +80,7 @@ archieve to zip
 
 *** Tasks ***
 from orderlist, foreach order, submit order and save receipt
-    Open Available Browser  ${PAGE_FORM_ORDER} 
+    Open Available Browser  ${PAGE_FORM_ORDER}
     Wait Until Keyword Succeeds     3x      5 sec   download order list
     ${table}=    Read table from CSV    ${INPUT_FILE}     header=true
     FOR  ${row}  IN  @{table}
@@ -94,7 +91,6 @@ from orderlist, foreach order, submit order and save receipt
         Wait Until Keyword Succeeds    ${RETRY_N_TIMES}    ${RETRY_AFTER_TIME}  5 screenshot Receipt    ${row}[Order number]
         Wait Until Keyword Succeeds    ${RETRY_N_TIMES}    ${RETRY_AFTER_TIME}  6 save receipt to pdf    ${row}[Order number]
         Wait Until Keyword Succeeds    ${RETRY_N_TIMES}    ${RETRY_AFTER_TIME}  7 order another
-        Exit For Loop
     END
     archieve to zip
     [Teardown]  Close Browser
