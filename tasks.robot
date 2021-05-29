@@ -80,3 +80,4 @@ from orderlist, foreach order, submit order and save receipt
         Wait Until Keyword Succeeds    ${RETRY_N_TIMES}    ${RETRY_AFTER_TIME}  6 save receipt to pdf    ${row}[Order number]
         Wait Until Keyword Succeeds    ${RETRY_N_TIMES}    ${RETRY_AFTER_TIME}  7 order another
     END
+    [Teardown]  Close Browser
