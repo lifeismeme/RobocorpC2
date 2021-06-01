@@ -6,6 +6,7 @@ Library           RPA.Tables
 Library           RPA.PDF
 Library           RPA.Archive
 Library           RPA.Robocloud.Secrets
+Library           RPA.Dialogs
 
 *** Variable ***
 ${INPUT_FILE}    ${CURDIR}${/}input${/}orderlist.csv
@@ -13,6 +14,12 @@ ${PAGE_FORM_ORDER}   https://robotsparebinindustries.com/#/robot-order
 ${RECEIPT_SELECTOR}    id:receipt
 ${RETRY_N_TIMES}        10x
 ${RETRY_AFTER_TIME}     1 sec
+
+*** Keywords ***
+prompt dialog to confirm download new input
+    Add heading       Download and use latest order list?
+    Add submit buttons    buttons=Yes,No    default=Yes
+    Run Keyword And Return    Run dialog
 
 *** Keywords ***
 download order list
@@ -85,7 +92,12 @@ archieve to zip
 from orderlist, foreach order, submit order and save receipt
     ${order}=    Get Secret    order
     Open Available Browser  ${order}[form_uri]
-    Wait Until Keyword Succeeds     3x      5 sec   download order list     ${order}[input_list_uri]
+    
+    ${dialog}=  prompt dialog to confirm download new input
+    IF   $dialog.submit == "Yes"
+        Wait Until Keyword Succeeds     3x      5 sec   download order list     ${order}[input_list_uri]
+    END
+    
     ${table}=    Read table from CSV    ${INPUT_FILE}     header=true
     FOR  ${row}  IN  @{table}
         Wait Until Keyword Succeeds    ${RETRY_N_TIMES}    ${RETRY_AFTER_TIME}  1 click on agree policy
@@ -96,5 +108,5 @@ from orderlist, foreach order, submit order and save receipt
         Wait Until Keyword Succeeds    ${RETRY_N_TIMES}    ${RETRY_AFTER_TIME}  6 save receipt to pdf    ${row}[Order number]
         Wait Until Keyword Succeeds    ${RETRY_N_TIMES}    ${RETRY_AFTER_TIME}  7 order another
     END
-    archieve to zip
+    #archieve to zip
     [Teardown]  Close Browser
