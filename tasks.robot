@@ -5,6 +5,7 @@ Library           RPA.HTTP
 Library           RPA.Tables
 Library           RPA.PDF
 Library           RPA.Archive
+Library           RPA.Robocloud.Secrets
 
 *** Variable ***
 ${INPUT_FILE}    ${CURDIR}${/}input${/}orderlist.csv
@@ -15,7 +16,9 @@ ${RETRY_AFTER_TIME}     1 sec
 
 *** Keywords ***
 download order list
-    Download    https://robotsparebinindustries.com/orders.csv  target_file=${INPUT_FILE}   overwrite=True
+    [Arguments]     ${input_csv}
+    #Download    https://robotsparebinindustries.com/orders.csv  target_file=${INPUT_FILE}   overwrite=True
+    Download    ${input_csv}  target_file=${INPUT_FILE}   overwrite=True
 
 
 *** Keywords ***
@@ -80,8 +83,9 @@ archieve to zip
 
 *** Tasks ***
 from orderlist, foreach order, submit order and save receipt
-    Open Available Browser  ${PAGE_FORM_ORDER}
-    Wait Until Keyword Succeeds     3x      5 sec   download order list
+    ${order}=    Get Secret    order
+    Open Available Browser  ${order}[form_uri]
+    Wait Until Keyword Succeeds     3x      5 sec   download order list     ${order}[input_list_uri]
     ${table}=    Read table from CSV    ${INPUT_FILE}     header=true
     FOR  ${row}  IN  @{table}
         Wait Until Keyword Succeeds    ${RETRY_N_TIMES}    ${RETRY_AFTER_TIME}  1 click on agree policy

@@ -1,0 +1,6 @@
+{
+    "order": {
+        "input_list_uri": "https://robotsparebinindustries.com/orders.csv",
+        "form_uri": "https://robotsparebinindustries.com/#/robot-order"
+    }
+}
